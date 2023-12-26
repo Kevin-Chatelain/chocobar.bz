@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chocobar.bz - Mes ingrédients
+{% endblock %}
+
+{% block body %}
+	<h1>Mes ingredients</h1>
+
+	<a href="{{ path('ingredient.new') }}">Ajouter un nouvel ingrédient</a>
+
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endfor %}
+
+	{% if ingredients is not empty %}
+		{# total items count #}
+		<div class="count">
+			<strong>{{ ingredients.getTotalItemCount }}
+				ingrédients au total 🫘</strong>
+		</div>
+
+		<table>
+			<tr>
+				<th>Nom</th>
+				<th>Prix</th>
+				<th>Date de création</th>
+				<th>Édition</th>
+				<th>Suppression</th>
+			</tr>
+
+			{% for ingredient in ingredients %}
+				<tr>
+					<td>{{ingredient.name}}</td>
+					<td>{{ingredient.price}}
+						€</td>
+					<td>{{ingredient.time_create|date('d/m/Y')}}</td>
+					<td><a href="{{ path('ingredient.edit', {id: ingredient.id}) }}">Modifier</a></td>
+					<td><a href="{{ path('ingredient.delete', {id: ingredient.id}) }}">Supprimer</a></td>
+				</tr>
+			{% endfor %}
+		</table>
+		{# display navigation #}
+		<div class="navigation">
+			{{ knp_pagination_render(ingredients) }}
+		</div>
+	{% else %}
+		<p>Aucun ingrédient</p>
+	{% endif %}
+
+{% endblock %}
