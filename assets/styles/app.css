@@ -8,6 +8,31 @@ body {
   box-sizing: border-box;
 }
 
+header {
+  display: flex;
+  max-width: 100%;
+  padding: 20px 40px;
+  justify-content: space-between;
+}
+header .logo {
+  margin-right: auto;
+  font-size: 25px;
+  font-weight: 500;
+}
+header ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+header ul li a {
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+}
+header ul li a:hover {
+  text-decoration: underline;
+}
+
 .choco-container {
   max-width: 1250px;
   margin: 0 auto;

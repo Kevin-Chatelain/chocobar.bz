@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chocobar.bz - Mes recettes
+{% endblock %}
+
+{% block body %}
+	<h1>Mes recettes</h1>
+
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endfor %}
+
+	<a href="{{ path('recipe.new') }}">Ajouter une nouvelle recette</a>
+
+	{% if recipes is not empty %}
+		{# total items count #}
+		<div class="count">
+			<strong>{{ recipes.getTotalItemCount }}
+				recettes au total 📝</strong>
+		</div>
+
+		<table>
+			<tr>
+				<th>Nom</th>
+				<th>Prix</th>
+				<th>Difficulté</th>
+				<th>Date de création</th>
+				<th>Édition</th>
+				<th>Suppression</th>
+			</tr>
+
+			{% for recipe in recipes %}
+				<tr>
+					<td>{{recipe.name}}</td>
+					{% if recipe.price is null %}
+						<td>/</td>
+					{% else %}
+						<td>{{recipe.price}}€</td>
+					{% endif %}
+					{% if recipe.difficulty is null %}
+						<td>/</td>
+					{% else %}
+						<td>{{recipe.difficulty}}</td>
+					{% endif %}
+					<td>{{recipe.timeCreate|date('d/m/Y')}}</td>
+					<td><a href="{{ path('recipe.edit', {id: recipe.id}) }}">Modifier</a></td>
+					<td><a href="{{ path('recipe.delete', {id: recipe.id}) }}">Supprimer</a></td>
+				</tr>
+			{% endfor %}
+		</table>
+		{# display navigation #}
+		<div class="navigation">
+			{{ knp_pagination_render(recipes) }}
+		</div>
+	{% else %}
+		<p>Aucune recettes</p>
+	{% endif %}
+
+{% endblock %}
