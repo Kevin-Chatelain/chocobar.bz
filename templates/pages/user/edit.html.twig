@@ -1,0 +1,17 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Chocobar.bz - Modifier votre profil
+{% endblock %}
+
+{% block body %}
+
+    {% for message in app.flashes('warning') %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endfor %}
+
+	<h1>Modification de votre profil</h1>
+    {{ form(form) }}
+
+{% endblock %}

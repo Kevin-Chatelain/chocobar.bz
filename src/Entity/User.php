@@ -52,9 +52,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull()]
     private ?\DateTimeImmutable $timeCreate = null;
 
+    #[ORM\Column]
+    #[Assert\NotNull()]
+    private ?\DateTimeImmutable $timeUpdate = null;
+
     public function __construct()
     {
         $this->timeCreate = new DateTimeImmutable();
+        $this->timeUpdate = new DateTimeImmutable();    
     }
 
     public function getId(): ?int
@@ -142,12 +147,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPlainPassword(): string
+    public function getPlainPassword()
     {
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(string $plainPassword): static
+    public function setPlainPassword($plainPassword): static
     {
         $this->plainPassword = $plainPassword;
 
@@ -171,6 +176,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTimeCreate(\DateTimeImmutable $timeCreate): static
     {
         $this->timeCreate = $timeCreate;
+
+        return $this;
+    }
+
+    public function gettimeUpdate(): ?\DateTimeImmutable
+    {
+        return $this->timeUpdate;
+    }
+
+    public function settimeUpdate(\DateTimeImmutable $timeUpdate): static
+    {
+        $this->timeUpdate = $timeUpdate;
 
         return $this;
     }
