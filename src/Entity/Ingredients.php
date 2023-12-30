@@ -33,6 +33,10 @@ class Ingredients
     #[Assert\NotNull()]
     private ?\DateTimeImmutable $time_create = null;
 
+    #[ORM\ManyToOne(inversedBy: 'ingredients')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->time_create = new DateTimeImmutable();
@@ -75,6 +79,18 @@ class Ingredients
     public function setTimeCreate(\DateTimeImmutable $time_create): static
     {
         $this->time_create = $time_create;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -4,33 +4,31 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
-use App\Form\UserPasswordType;
 use DateTimeImmutable;
+use App\Form\UserPasswordType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends AbstractController
 {
+    #[IsGranted(
+        attribute: new Expression('is_granted("ROLE_USER") and user == subject'),
+        subject: 'chosenUser'
+    )]
     #[Route('/user/edit/{id}', name: 'user.edit', methods: ['GET', 'POST'])]
-    public function edit(EntityManagerInterface $manager, User $user, Request $request, UserPasswordHasherInterface $hasher): Response {
-        if(!$this->getUser()) {
-            return $this->redirectToRoute('security.login');            
-        }
-
-        if($this->getUser() !== $user) {
-            return $this->redirectToRoute('recipe.index');   
-        }
-        
-        $form = $this->createForm(UserType::class, $user);
-
+    public function edit(EntityManagerInterface $manager, User $chosenUser, Request $request, UserPasswordHasherInterface $hasher): Response {
+        $form = $this->createForm(UserType::class, $chosenUser);
         $form->handleRequest($request);
+        
         if($form->isSubmitted() && $form->isValid()) {
-            if($hasher->isPasswordValid($user, $form->getData()->getPlainPassword())) {
+            if($hasher->isPasswordValid($chosenUser, $form->getData()->getPlainPassword())) {
                 $user = $form->getData();
                 $manager->persist($user);
                 $manager->flush();
@@ -46,25 +44,20 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[IsGranted(
+        attribute: new Expression('is_granted("ROLE_USER") and user == subject'),
+        subject: 'chosenUser'
+    )]
     #[Route('/user/edit/{id}/password', name: 'user.edit.password', methods: ['GET', 'POST'])]
-    public function editPassword(User $user, Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $manager): Response {
-        if(!$this->getUser()) {
-            return $this->redirectToRoute('security.login');            
-        }
-
-        if($this->getUser() !== $user) {
-            return $this->redirectToRoute('recipe.index');   
-        }
-        
+    public function editPassword(User $chosenUser, Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $manager): Response {
         $form = $this->createForm(UserPasswordType::class);
-
         $form->handleRequest($request);
         
         if($form->isSubmitted() && $form->isValid()) {
-            if($hasher->isPasswordValid($user, $form->getData()['plainPassword'])) {
-                $user->settimeUpdate(new DateTimeImmutable());
-                $user->setPlainPassword($form->getData()['newPassword']);
-                $manager->persist($user);
+            if($hasher->isPasswordValid($chosenUser, $form->getData()['plainPassword'])) {
+                $chosenUser->settimeUpdate(new DateTimeImmutable());
+                $chosenUser->setPlainPassword($form->getData()['newPassword']);
+                $manager->persist($chosenUser);
                 $manager->flush();
                 $this->addFlash('success', 'Nouveau mot de passe enregistré !');
                 return $this->redirectToRoute('recipe.index');

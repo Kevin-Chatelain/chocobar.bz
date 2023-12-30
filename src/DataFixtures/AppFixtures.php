@@ -21,10 +21,25 @@ class AppFixtures extends Fixture {
         
 
     public function load(ObjectManager $manager): void {
+        $users = [];
+        for($h=0; $h < 10; $h++) {
+            $user = new User();
+            $user->setFullName($this->faker->name())
+            ->setPseudo(mt_rand(0,1) === 1 ? $this->faker->firstName() : null)
+            ->setEmail($this->faker->email())
+            ->setRoles(['ROLE_USER'])
+            ->setPlainPassword('password');
+            $users[] = $user;
+            $manager->persist($user);  
+        }
+
         $ingredients = [];
         for ($i = 1; $i < 20; $i++) { 
             $ingredient = new Ingredients();
-            $ingredient->setName($this->faker->word())->setPrice(mt_rand(0, 15));
+            $ingredient->setName($this->faker->word())
+            ->setPrice(mt_rand(0, 15))
+            ->setUser($users[mt_rand(0, count($users) - 1)]);
+
             $ingredients[] = $ingredient;
             $manager->persist($ingredient);   
         }
@@ -38,23 +53,14 @@ class AppFixtures extends Fixture {
             ->setdifficulty(mt_rand(0, 1) == 1 ? mt_rand(1, 5) : null)
             ->setDescription($this->faker->text(300))
             ->setPrice(mt_rand(0, 1) == 1 ? mt_rand(1, 100) : null)
-            ->setIsFavorite(mt_rand(0, 1) == 1 ? true : false);
+            ->setIsFavorite(mt_rand(0, 1) == 1 ? true : false)
+            ->setUser($users[mt_rand(0, count($users) - 1)]);
 
             for ($k = 0; $k < mt_rand(5, 15); $k++) {
                 $recipe->addIngredient($ingredients[mt_rand(0, count($ingredients) - 1)]);
             }
 
             $manager->persist($recipe);   
-        }
-
-        for($h=0; $h < 10; $h++) {
-            $user = new User();
-            $user->setFullName($this->faker->name())
-            ->setPseudo(mt_rand(0,1) === 1 ? $this->faker->firstName() : null)
-            ->setEmail($this->faker->email())
-            ->setRoles(['ROLE_USER'])
-            ->setPlainPassword('password');
-            $manager->persist($user);  
         }
 
         $manager->flush();

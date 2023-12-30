@@ -1,6 +1,7 @@
 <header>
     <div class="logo">Chocobar.bz 🍫</div>
 
+{% if app.user %}
     <nav>
         <ul>
             <li><a href="{{path('home.index')}}">Accueil</a></li>
@@ -8,4 +9,12 @@
             <li><a href="{{path('recipe.index')}}">Recettes</a></li>
         </ul>
     </nav>
+{% else %}
+    <nav>
+        <ul>
+            <li><a href="{{path('security.login')}}">Se connecter</a></li>
+            <li><a href="{{path('security.register')}}">S'inscrire</a></li>
+        </ul>
+    </nav>
+{% endif %}
 </header>

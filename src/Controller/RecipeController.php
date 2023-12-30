@@ -10,15 +10,18 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
 {
+    #[IsGranted('ROLE_USER')]
     #[Route('/recipe', name: 'recipe.index', methods: ['GET'])]
     public function index(PaginatorInterface $paginator, RecipeRepository $repository, Request $request): Response
     {
         $recipes = $paginator->paginate(
-            $repository->findAll(),
+            $repository->findBy(['user' => $this->getUser()]),
             $request->query->getInt('page', 1),
             10 
         );
@@ -28,6 +31,7 @@ class RecipeController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/recipe/new', name: 'recipe.new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $manager) : Response {
         $recipe = new Recipe();
@@ -48,6 +52,11 @@ class RecipeController extends AbstractController
         ]);
     }
 
+
+    #[IsGranted(
+        attribute: new Expression('is_granted("ROLE_USER") and user == subject.getUser()'),
+        subject: 'recipe'
+    )]
     #[Route('/recipe/modify/{id}', 'recipe.edit', methods: ['GET', 'POST'])]
     public function edit(Recipe $recipe, Request $request, EntityManagerInterface $manager) : Response {
         
@@ -56,6 +65,7 @@ class RecipeController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()) {
           $recipe = $form->getData();
+          $recipe->setUser($this->getUser());
           $manager->persist($recipe);
           $manager->flush();
           $this->addFlash('success', 'Recette modifiée avec succès !');
@@ -68,6 +78,10 @@ class RecipeController extends AbstractController
         ]);
     }
 
+    #[IsGranted(
+        attribute: new Expression('is_granted("ROLE_USER") and user == subject.getUser()'),
+        subject: 'recipe'
+    )]
     #[Route('/recipe/delete/{id}', 'recipe.delete', methods: ['POST', 'GET'])]
     public function delete(EntityManagerInterface $manager, Recipe $recipe) : Response {
         if($recipe) {
