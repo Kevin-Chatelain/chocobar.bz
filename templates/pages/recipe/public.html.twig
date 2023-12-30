@@ -1,22 +1,29 @@
-{% extends "base.html.twig" %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Chocobar.bz - Accueil
+{% block title %}Chocobar.bz - Mes recettes
 {% endblock %}
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="{{ asset('styles/app.css') }}">
-	<link href="{{ asset('styles/home/home.css') }}" rel="stylesheet">
+	<link href="{{ asset('styles/recipe/recipe.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
+	<h1>Les recettes</h1>
 
-	<h1>Chocobar.bz</h1>
-	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam id semper nibh. Curabitur tincidunt porttitor pharetra. Aenean mollis mauris quis bibendum vestibulum. Proin convallis consequat leo, sit amet posuere elit gravida tristique. Pellentesque pulvinar metus non ipsum ultricies porttitor. Fusce eget nulla interdum, porttitor purus non, tristique turpis. Praesent rhoncus lorem a magna faucibus, vel rutrum nunc aliquet.</p>
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endfor %}
 
-	<br>
-
-	<h2>Les dernières recettes de la communauté...</h2>
 	{% if recipes is not empty %}
+		{# total items count #}
+		<div class="count">
+			<strong>{{ recipes.getTotalItemCount }}
+				recettes au total 📝</strong>
+		</div>
+
         <div class="choco-public-recipes">
 		{% for recipe in recipes %}
 			<a href="{{ path('recipe', {'id': recipe.id}) }}">
@@ -28,6 +35,11 @@
             </a>
 		{% endfor %}
         </div>
+
+		{# display navigation #}
+		<div class="navigation">
+			{{ knp_pagination_render(recipes) }}
+		</div>
 	{% else %}
 		<p>Aucune recettes</p>
 	{% endif %}

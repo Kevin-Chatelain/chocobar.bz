@@ -31,6 +31,19 @@ class RecipeController extends AbstractController
         ]);
     }
 
+    #[Route('/recipe/public', 'recipe.public', methods: ['GET'])]
+    public function indexPublic(RecipeRepository $repository, PaginatorInterface $paginator, Request $request): Response {
+        $recipes = $paginator->paginate(
+            $repository->findPublicRecipes(null),
+            $request->query->getInt('page', 1),
+            10 
+        );
+
+        return $this->render('pages/recipe/public.html.twig', [
+            'recipes' => $recipes
+        ]);
+    }
+
     #[IsGranted('ROLE_USER')]
     #[Route('/recipe/new', name: 'recipe.new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $manager) : Response {
@@ -49,6 +62,17 @@ class RecipeController extends AbstractController
         }
         return $this->render('pages/recipe/new.html.twig', [
             'form' => $form->createView()
+        ]);
+    }
+
+    #[IsGranted(
+        attribute: new Expression('subject.isIsPublic() === true'),
+        subject: 'recipe',
+    )]
+    #[Route('/recipe/{id}', name: 'recipe.show', methods: ['GET'])]
+    public function show(Recipe $recipe) : Response {
+        return $this->render('pages/recipe/show.html.twig', [
+            'recipe' => $recipe
         ]);
     }
 

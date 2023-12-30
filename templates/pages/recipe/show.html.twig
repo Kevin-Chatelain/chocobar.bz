@@ -1,0 +1,29 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Chocobar.bz - Recette "{{ recipe.name }}"
+{% endblock %}
+
+{% block body %}
+
+	<h1>Recette - "{{ recipe.name }}"</h1>
+	<p>{{ recipe.timeCreate|date("d/m/Y")}}</p>
+	<br>
+
+	<p>Difficulté :
+		{{ recipe.difficulty }}/5</p>
+	<p>Pour
+		{{ recipe.nbPeople }}
+		personnes</p>
+	{% if recipe.price is not null %}
+		<p>{{ recipe.price }}
+			€</p>
+	{% endif %}
+	<p>{{ recipe.description }}</p>
+	<br>
+	<p>Ingrédients :
+	</p>
+	{% for i in recipe.ingredients %}
+		<span>{{ i.name }}</span>
+	{% endfor %}
+
+{% endblock %}
